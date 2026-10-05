@@ -1,0 +1,106 @@
+:root {
+    --color-principal: #198754;
+    --color-principal-oscuro: #146c43;
+    --color-fondo: #f4f6f8;
+    --color-borde: #d8dee4;
+    --color-texto-secundario: #6c757d;
+    --color-total-fondo: #d1e7dd;
+    --color-total-texto: #0f5132;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    background-color: var(--color-fondo);
+}
+
+.navbar-brand {
+    font-weight: 600;
+}
+
+.card {
+    border: 0;
+    border-radius: 12px;
+}
+
+.card-body {
+    padding: 24px;
+}
+
+.form-label {
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.form-control,
+.form-select {
+    min-height: 42px;
+    border-radius: 8px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-principal);
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.2);
+}
+
+.form-text {
+    color: var(--color-texto-secundario);
+    font-size: 0.8rem;
+}
+
+.btn-success {
+    min-height: 46px;
+    border-color: var(--color-principal);
+    border-radius: 8px;
+    background-color: var(--color-principal);
+    font-weight: 600;
+}
+
+.btn-success:hover {
+    border-color: var(--color-principal-oscuro);
+    background-color: var(--color-principal-oscuro);
+}
+
+.btn-success:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Mapa */
+#mapa {
+    display: block;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 560px;
+    min-height: 560px;
+    border: 1px solid #d8dee4;
+    border-radius: 10px;
+    background-color: #e9ecef;
+    overflow: hidden;
+}
+
+.leaflet-container {
+    width: 100%;
+    height: 100%;
+    font-family: inherit;
+}
+
+@media (max-width: 1199px) {
+    #mapa {
+        height: 500px;
+        min-height: 500px;
+    }
+}
+
+@media (max-width: 767px) {
+    #mapa {
+        height: 420px;
+        min-height: 420px;
+    }
+}
