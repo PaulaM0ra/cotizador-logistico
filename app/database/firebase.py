@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from pathlib import Path
 
@@ -7,30 +8,81 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 
 
+logger = logging.getLogger(__name__)
+
 BASE_DIR = Path(__file__).resolve().parents[2]
 CLAVE_LOCAL = BASE_DIR / "firebase-key.json"
 
 
-def obtener_credencial():
-    credencial_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
+def inicializar_firebase():
+    if firebase_admin._apps:
+        return firebase_admin.get_app()
+
+    credencial_json = os.getenv(
+        "FIREBASE_SERVICE_ACCOUNT_JSON"
+    )
 
     if credencial_json:
-        informacion = json.loads(credencial_json)
-        return credentials.Certificate(informacion)
+        try:
+            informacion = json.loads(
+                credencial_json
+            )
+
+            credencial = credentials.Certificate(
+                informacion
+            )
+
+            logger.info(
+                "Firebase inicializado desde variable "
+                "de entorno."
+            )
+
+            return firebase_admin.initialize_app(
+                credencial
+            )
+
+        except json.JSONDecodeError as error:
+            logger.exception(
+                "FIREBASE_SERVICE_ACCOUNT_JSON "
+                "no contiene JSON válido."
+            )
+
+            raise RuntimeError(
+                "La variable "
+                "FIREBASE_SERVICE_ACCOUNT_JSON "
+                "no contiene JSON válido."
+            ) from error
+
+        except Exception as error:
+            logger.exception(
+                "No fue posible inicializar Firebase "
+                "desde la variable de entorno."
+            )
+
+            raise RuntimeError(
+                "No fue posible inicializar Firebase "
+                "Admin."
+            ) from error
 
     if CLAVE_LOCAL.exists():
-        return credentials.Certificate(str(CLAVE_LOCAL))
+        credencial = credentials.Certificate(
+            str(CLAVE_LOCAL)
+        )
 
-    return None
+        logger.info(
+            "Firebase inicializado desde "
+            "firebase-key.json local."
+        )
+
+        return firebase_admin.initialize_app(
+            credencial
+        )
+
+    raise RuntimeError(
+        "No se encontraron credenciales de Firebase. "
+        "Configura FIREBASE_SERVICE_ACCOUNT_JSON."
+    )
 
 
-if not firebase_admin._apps:
-    credencial = obtener_credencial()
-
-    if credencial:
-        firebase_admin.initialize_app(credencial)
-    else:
-        firebase_admin.initialize_app()
-
-
-db = firestore.client()
+firebase_app = inicializar_firebase()
+db = firestore.client(app=firebase_app)
