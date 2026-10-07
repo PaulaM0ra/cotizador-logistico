@@ -1,74 +1,50 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query, status
 
-from app.database.firebase import db
-from app.models.vehiculo import Vehiculo
-
-router = APIRouter(
-    prefix="/vehiculos",
-    tags=["Vehiculos"]
+from app.dependencies.autenticacion import UsuarioActual
+from app.models.vehiculo import (
+    ActualizarVehiculo,
+    CrearVehiculo,
+    VehiculoRespuesta,
+)
+from app.services.vehiculos import (
+    actualizar_vehiculo,
+    crear_vehiculo,
+    desactivar_vehiculo,
+    listar_vehiculos,
+    obtener_vehiculo,
 )
 
 
-@router.post("/")
-async def crear_vehiculo(vehiculo: Vehiculo):
+router = APIRouter(prefix="/vehiculos", tags=["Vehículos"])
 
-    data = vehiculo.dict()
 
-    db.collection("vehiculos").add(data)
+@router.post("", response_model=VehiculoRespuesta, status_code=status.HTTP_201_CREATED)
+async def registrar_vehiculo(datos: CrearVehiculo, usuario: UsuarioActual):
+    return await crear_vehiculo(usuario, datos)
 
-    return {
-        "mensaje": "Vehículo registrado correctamente"
-    }
-@router.get("/")
-async def listar_vehiculos():
 
-    documentos = db.collection("vehiculos").stream()
-
-    vehiculos = []
-
-    for doc in documentos:
-
-        dato = doc.to_dict()
-        dato["id"] = doc.id
-
-        vehiculos.append(dato)
-
-    return vehiculos
-@router.get("/{vehiculo_id}")
-async def obtener_vehiculo(vehiculo_id: str):
-
-    doc = db.collection("vehiculos").document(vehiculo_id).get()
-
-    if not doc.exists:
-        raise HTTPException(
-            status_code=404,
-            detail="Vehículo no encontrado"
-        )
-
-    data = doc.to_dict()
-    data["id"] = doc.id
-
-    return data
-@router.delete("/{vehiculo_id}")
-async def eliminar_vehiculo(vehiculo_id: str):
-
-    db.collection("vehiculos").document(
-        vehiculo_id
-    ).delete()
-
-    return {
-        "mensaje": "Vehículo eliminado"
-    }
-@router.put("/{vehiculo_id}")
-async def actualizar_vehiculo(
-    vehiculo_id: str,
-    vehiculo: Vehiculo
+@router.get("", response_model=list[VehiculoRespuesta])
+async def consultar_vehiculos(
+    usuario: UsuarioActual,
+    incluir_inactivos: bool = Query(default=False),
 ):
+    return await listar_vehiculos(usuario, incluir_inactivos)
 
-    db.collection("vehiculos") \
-      .document(vehiculo_id) \
-      .update(vehiculo.dict())
 
-    return {
-        "mensaje": "Vehículo actualizado"
-    }
+@router.get("/{placa}", response_model=VehiculoRespuesta)
+async def consultar_vehiculo(placa: str, usuario: UsuarioActual):
+    return await obtener_vehiculo(usuario, placa)
+
+
+@router.patch("/{placa}", response_model=VehiculoRespuesta)
+async def modificar_vehiculo(
+    placa: str,
+    cambios: ActualizarVehiculo,
+    usuario: UsuarioActual,
+):
+    return await actualizar_vehiculo(usuario, placa, cambios)
+
+
+@router.delete("/{placa}", response_model=VehiculoRespuesta)
+async def eliminar_vehiculo(placa: str, usuario: UsuarioActual):
+    return await desactivar_vehiculo(usuario, placa)

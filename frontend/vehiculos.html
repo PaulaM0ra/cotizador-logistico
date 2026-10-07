@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis vehículos | Cotizador Logístico G&amp;A</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    >
+    <link rel="stylesheet" href="/css/vehiculos.css?v=2">
+</head>
+<body>
+    <header class="topbar">
+        <div class="container-fluid px-lg-4 topbar-content">
+            <a class="brand" href="/mapa">
+                <span class="brand-symbol">G&amp;A</span>
+                <span>
+                    <strong>Mis vehículos</strong>
+                    <small>Cotizador logístico</small>
+                </span>
+            </a>
+
+            <nav class="topbar-actions" aria-label="Navegación principal">
+                <a class="nav-button" href="/mapa">Ir al cotizador</a>
+                <button
+                    id="cerrar-sesion"
+                    class="nav-button nav-button-outline"
+                    type="button"
+                >
+                    Cerrar sesión
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container-fluid px-lg-4 hero-content">
+            <div>
+                <p class="eyebrow">Flota del conductor</p>
+                <h1>Registra y administra tus vehículos</h1>
+                <p>
+                    La placa identifica cada vehículo. El tipo, la carrocería,
+                    el combustible, el rendimiento y la categoría de peaje se
+                    podrán cargar automáticamente en la cotización.
+                </p>
+            </div>
+
+            <div class="session-card">
+                <span>Sesión activa</span>
+                <strong id="usuario-email">Cargando...</strong>
+            </div>
+        </div>
+    </section>
+
+    <main class="container-fluid px-lg-4 py-4 py-lg-5">
+        <div
+            id="mensaje-vehiculos"
+            class="alert d-none"
+            role="alert"
+        ></div>
+
+        <div class="workspace">
+            <section class="panel form-panel">
+                <div class="panel-heading">
+                    <span class="step">01</span>
+                    <div>
+                        <p class="eyebrow">Datos técnicos</p>
+                        <h2 id="titulo-formulario">Registrar vehículo</h2>
+                    </div>
+                </div>
+
+                <form id="form-vehiculo">
+                    <div class="form-section">
+                        <h3>Identificación y clasificación</h3>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="placa" class="form-label">
+                                    Placa del vehículo
+                                </label>
+                                <input
+                                    id="placa"
+                                    class="form-control text-uppercase"
+                                    type="text"
+                                    minlength="5"
+                                    maxlength="8"
+                                    placeholder="ABC123"
+                                    autocomplete="off"
+                                    required
+                                >
+                                <div class="form-text">
+                                    Será el identificador único y no se podrá
+                                    cambiar después del registro.
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label
+                                    for="tipo-vehiculo-registro"
+                                    class="form-label"
+                                >
+                                    Tipo de vehículo
+                                </label>
+
+                                <select
+                                    id="tipo-vehiculo-registro"
+                                    class="form-select"
+                                    required
+                                >
+                                    <optgroup label="Urbano y última milla">
+                                        <option value="automovil">
+                                            Automóvil
+                                        </option>
+                                        <option value="camioneta">
+                                            Camioneta
+                                        </option>
+                                        <option value="campero">
+                                            Campero
+                                        </option>
+                                        <option value="motocarro">
+                                            Motocarro / Carry
+                                        </option>
+                                        <option value="furgon_ultraliviano">
+                                            Furgón ultraliviano
+                                        </option>
+                                    </optgroup>
+
+                                    <optgroup label="Turbos de distribución">
+                                        <option value="turbo_liviana">
+                                            Turbo liviana
+                                        </option>
+                                        <option value="turbo_pesada">
+                                            Turbo pesada
+                                        </option>
+                                    </optgroup>
+
+                                    <optgroup label="Transporte de pasajeros">
+                                        <option value="bus">Bus</option>
+                                        <option value="buseta">Buseta</option>
+                                        <option value="microbus">Microbús</option>
+                                    </optgroup>
+
+                                    <optgroup label="Camiones rígidos">
+                                        <option value="camion_sencillo">
+                                            Camión sencillo (C2)
+                                        </option>
+                                        <option value="doble_troque">
+                                            Doble troque (C3)
+                                        </option>
+                                        <option value="cuatro_manos">
+                                            Cuatro manos (C4)
+                                        </option>
+                                    </optgroup>
+
+                                    <optgroup label="Vehículos articulados">
+                                        <option value="mini_mula">
+                                            Mini mula (C2S1 / C2S2)
+                                        </option>
+                                        <option value="tractocamion">
+                                            Tractocamión
+                                        </option>
+                                        <option value="tractomula">
+                                            Tractomula / camión tráiler (C3S3)
+                                        </option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label
+                                    for="tipo-carroceria"
+                                    class="form-label"
+                                >
+                                    Tipo de carrocería
+                                </label>
+
+                                <select
+                                    id="tipo-carroceria"
+                                    class="form-select"
+                                    required
+                                >
+                                    <option value="sin_furgon">
+                                        Sin furgón
+                                    </option>
+                                    <option value="furgon_seco">
+                                        Furgón seco general
+                                    </option>
+                                    <option value="furgon_refrigerado">
+                                        Furgón refrigerado
+                                    </option>
+                                    <option value="furgon_congelado">
+                                        Furgón para congelados
+                                    </option>
+                                    <option value="furgon_seco_capacete">
+                                        Furgón seco con capacete
+                                    </option>
+                                    <option value="furgon_paqueteria">
+                                        Furgón de paquetería / última milla
+                                    </option>
+                                    <option value="furgon_blindado">
+                                        Furgón de seguridad / blindado
+                                    </option>
+                                </select>
+
+                                <div class="form-text">
+                                    Describe la carrocería utilizada para
+                                    transportar la carga.
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="numero-ejes" class="form-label">
+                                    Número de ejes
+                                </label>
+                                <input
+                                    id="numero-ejes"
+                                    class="form-control"
+                                    type="number"
+                                    min="2"
+                                    max="9"
+                                    value="2"
+                                    required
+                                >
+                            </div>
+
+                            <div class="col-md-6">
+                                <label
+                                    for="categoria-peaje-registro"
+                                    class="form-label"
+                                >
+                                    Categoría de peaje
+                                </label>
+                                <select
+                                    id="categoria-peaje-registro"
+                                    class="form-select"
+                                    required
+                                >
+                                    <option value="I">Categoría I</option>
+                                    <option value="II">Categoría II</option>
+                                    <option value="III">Categoría III</option>
+                                    <option value="IV">Categoría IV</option>
+                                    <option value="V">Categoría V</option>
+                                    <option value="VI">Categoría VI</option>
+                                    <option value="VII">Categoría VII</option>
+                                </select>
+                                <div
+                                    id="ayuda-categoria"
+                                    class="form-text"
+                                >
+                                    Verifica la categoría según el vehículo
+                                    y la concesión.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Combustible y capacidad</h3>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label
+                                    for="tipo-combustible-registro"
+                                    class="form-label"
+                                >
+                                    Combustible
+                                </label>
+                                <select
+                                    id="tipo-combustible-registro"
+                                    class="form-select"
+                                    required
+                                >
+                                    <option value="acpm">ACPM</option>
+                                    <option value="gasolina">Gasolina</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label
+                                    for="rendimiento-registro"
+                                    class="form-label"
+                                >
+                                    Rendimiento km/galón
+                                </label>
+                                <input
+                                    id="rendimiento-registro"
+                                    class="form-control"
+                                    type="number"
+                                    min="0.1"
+                                    max="100"
+                                    step="0.1"
+                                    value="10"
+                                    required
+                                >
+                            </div>
+
+                            <div class="col-12">
+                                <label
+                                    for="capacidad-carga"
+                                    class="form-label"
+                                >
+                                    Capacidad de carga en kg
+                                </label>
+                                <input
+                                    id="capacidad-carga"
+                                    class="form-control"
+                                    type="number"
+                                    min="0"
+                                    max="100000"
+                                    step="1"
+                                    value="0"
+                                    required
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Dimensiones</h3>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="largo" class="form-label">
+                                    Largo, m
+                                </label>
+                                <input
+                                    id="largo"
+                                    class="form-control"
+                                    type="number"
+                                    min="0.1"
+                                    max="30"
+                                    step="0.01"
+                                    required
+                                >
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="ancho" class="form-label">
+                                    Ancho, m
+                                </label>
+                                <input
+                                    id="ancho"
+                                    class="form-control"
+                                    type="number"
+                                    min="0.1"
+                                    max="5"
+                                    step="0.01"
+                                    required
+                                >
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="alto" class="form-label">
+                                    Alto, m
+                                </label>
+                                <input
+                                    id="alto"
+                                    class="form-control"
+                                    type="number"
+                                    min="0.1"
+                                    max="6"
+                                    step="0.01"
+                                    required
+                                >
+                            </div>
+
+                            <div class="col-12">
+                                <label
+                                    for="observaciones"
+                                    class="form-label"
+                                >
+                                    Observaciones
+                                </label>
+                                <textarea
+                                    id="observaciones"
+                                    class="form-control"
+                                    rows="3"
+                                    maxlength="500"
+                                    placeholder="Información adicional del vehículo"
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button
+                            id="guardar-vehiculo"
+                            class="primary-button"
+                            type="submit"
+                        >
+                            Guardar vehículo
+                        </button>
+
+                        <button
+                            id="cancelar-edicion"
+                            class="secondary-button d-none"
+                            type="button"
+                        >
+                            Cancelar edición
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="panel list-panel">
+                <div class="panel-heading">
+                    <span class="step">02</span>
+                    <div>
+                        <p class="eyebrow">Flota registrada</p>
+                        <h2>Mis vehículos</h2>
+                    </div>
+                </div>
+
+                <div id="estado-lista" class="empty-state">
+                    Cargando vehículos...
+                </div>
+
+                <div id="lista-vehiculos" class="vehicle-list"></div>
+            </section>
+        </div>
+    </main>
+
+    <script src="/js/firebase-config.js?v=2"></script>
+    <script type="module" src="/js/vehiculos-ui.js?v=3"></script>
+</body>
+</html>

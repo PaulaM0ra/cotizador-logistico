@@ -102,7 +102,17 @@ async def mostrar_acceso():
     return FileResponse(
         str(archivo_acceso)
     )
+@app.get("/mis-vehiculos", include_in_schema=False)
+async def mostrar_vehiculos():
+    archivo = FRONTEND_DIR / "vehiculos.html"
 
+    if not archivo.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="No se encontró frontend/vehiculos.html"
+        )
+
+    return FileResponse(str(archivo))
 
 
 @app.get("/salud", tags=["Inicio"])
