@@ -1,492 +1,233 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cotizador Logístico G&amp;A</title>
 
-    <!-- Bootstrap -->
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    >
-
-    <!-- Leaflet -->
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    >
-
-    <!-- Estilos propios -->
-
-<link rel="stylesheet" href="/css/estilos.css?v=3">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="/css/index-azul.css?v=1">
 </head>
-
 <body>
-    <!-- Barra de navegación -->
-    <nav class="navbar navbar-dark bg-success">
-        <div class="container">
-            <span class="navbar-brand fw-semibold">
-                Cotizador Logístico G&amp;A
-            </span>
+    <header class="topbar">
+        <div class="container-fluid px-lg-4">
+            <div class="topbar-content">
+                <a class="brand" href="/mapa" aria-label="Cotizador Logístico G&A">
+                    <span class="brand-symbol">G&amp;A</span>
+                    <span>
+                        <strong>Cotizador Logístico</strong>
+                        <small>Rutas, combustible y peajes</small>
+                    </span>
+                </a>
+
+                <nav class="topbar-actions" aria-label="Navegación principal">
+                    <a class="nav-button nav-button-light" href="/acceso">Mi cuenta</a>
+                </nav>
+            </div>
         </div>
-    </nav>
+    </header>
 
-    <main class="container-fluid px-lg-4 py-4">
-        <div class="row g-4">
+    <section class="hero-section">
+        <div class="container-fluid px-lg-4">
+            <div class="hero-grid">
+                <div>
+                    <p class="hero-kicker">Planeación logística inteligente</p>
+                    <h1>Cotiza cada viaje con información clara y centralizada</h1>
+                    <p>
+                        Selecciona origen, destino y vehículo. El sistema calcula ruta,
+                        combustible, peajes, gastos y utilidad en un solo proceso.
+                    </p>
+                </div>
+                <div class="hero-badge" aria-hidden="true">
+                    <span class="hero-line"></span>
+                    <span class="hero-pin hero-pin-one"></span>
+                    <span class="hero-pin hero-pin-two"></span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            <!-- Formulario -->
-            <section class="col-xl-4">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-
-                        <h1 class="h4 mb-4">
-                            Cotizar viaje
-                        </h1>
-
-                        <form id="form-cotizacion">
-
-                            <!-- Ruta -->
-                            <h2 class="h6 text-success mt-4">
-                                Ruta
-                            </h2>
-
-                            <div class="row g-3">
-
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="origen-longitud"
-                                        class="form-label"
-                                    >
-                                        Longitud de origen
-                                    </label>
-
-                                    <input
-                                        id="origen-longitud"
-                                        class="form-control"
-                                        type="number"
-                                        step="any"
-                                        min="-180"
-                                        max="180"
-                                        value="-74.0721"
-                                        required
-                                    >
-                                </div>
-
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="origen-latitud"
-                                        class="form-label"
-                                    >
-                                        Latitud de origen
-                                    </label>
-
-                                    <input
-                                        id="origen-latitud"
-                                        class="form-control"
-                                        type="number"
-                                        step="any"
-                                        min="-90"
-                                        max="90"
-                                        value="4.711"
-                                        required
-                                    >
-                                </div>
-
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="destino-longitud"
-                                        class="form-label"
-                                    >
-                                        Longitud de destino
-                                    </label>
-
-                                    <input
-                                        id="destino-longitud"
-                                        class="form-control"
-                                        type="number"
-                                        step="any"
-                                        min="-180"
-                                        max="180"
-                                        value="-74.3638"
-                                        required
-                                    >
-                                </div>
-
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="destino-latitud"
-                                        class="form-label"
-                                    >
-                                        Latitud de destino
-                                    </label>
-
-                                    <input
-                                        id="destino-latitud"
-                                        class="form-control"
-                                        type="number"
-                                        step="any"
-                                        min="-90"
-                                        max="90"
-                                        value="4.3365"
-                                        required
-                                    >
-                                </div>
-
-                            </div>
-
-                            <!-- Vehículo y combustible -->
-                            <h2 class="h6 text-success mt-4">
-                                Vehículo y combustible
-                            </h2>
-
-                            <div class="row g-3">
-
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="tipo-vehiculo"
-                                        class="form-label"
-                                    >
-                                        Tipo de vehículo
-                                    </label>
-
-                                    <select
-                                        id="tipo-vehiculo"
-                                        class="form-select"
-                                        required
-                                    >
-                                        <option value="camion">
-                                            Camión
-                                        </option>
-
-                                        <option value="carro">
-                                            Carro
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="tipo-combustible"
-                                        class="form-label"
-                                    >
-                                        Tipo de combustible
-                                    </label>
-
-                                    <select
-                                        id="tipo-combustible"
-                                        class="form-select"
-                                        required
-                                    >
-                                        <option value="acpm">
-                                            ACPM
-                                        </option>
-
-                                        <option value="gasolina">
-                                            Gasolina
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="rendimiento"
-                                        class="form-label"
-                                    >
-                                        Rendimiento km/galón
-                                    </label>
-
-                                    <input
-                                        id="rendimiento"
-                                        class="form-control"
-                                        type="number"
-                                        min="0.1"
-                                        max="100"
-                                        step="0.1"
-                                        value="10"
-                                        required
-                                    >
-
-                                    <div class="form-text">
-                                        Kilómetros recorridos por cada galón.
-                                    </div>
-                                </div>
-
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="precio-combustible"
-                                        class="form-label"
-                                    >
-                                        Precio por galón
-                                    </label>
-
-                                    <input
-                                        id="precio-combustible"
-                                        class="form-control"
-                                        type="number"
-                                        min="1"
-                                        step="1"
-                                        value="11616"
-                                        required
-                                    >
-
-                                    <div class="form-text">
-                                        Valor en pesos colombianos.
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <!-- Costos -->
-                            <h2 class="h6 text-success mt-4">
-                                Costos del viaje
-                            </h2>
-
-                            <div class="row g-3">
-
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="numero-trayectos"
-                                        class="form-label"
-                                    >
-                                        Tipo de trayecto
-                                    </label>
-
-                                    <select
-                                        id="numero-trayectos"
-                                        class="form-select"
-                                        required
-                                    >
-                                        <option value="1">
-                                            Solo ida
-                                        </option>
-
-                                        <option value="2">
-                                            Ida y regreso
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <!-- Categoría de peaje -->
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="categoria-peaje"
-                                        class="form-label"
-                                    >
-                                        Categoría de peaje
-                                    </label>
-
-                                    <select
-                                        id="categoria-peaje"
-                                        class="form-select"
-                                        required
-                                    >
-                                        <option value="I">
-                                            Categoría I
-                                        </option>
-
-                                        <option value="II">
-                                            Categoría II
-                                        </option>
-
-                                        <option value="III">
-                                            Categoría III
-                                        </option>
-
-                                        <option value="IV">
-                                            Categoría IV
-                                        </option>
-
-                                        <option value="V">
-                                            Categoría V
-                                        </option>
-                                    </select>
-
-                                    <div class="form-text">
-                                        Selecciona la categoría tarifaria
-                                        correspondiente al vehículo.
-                                    </div>
-                                </div>
-
-                                <!-- Modo de cálculo de peajes -->
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="modo-peajes"
-                                        class="form-label"
-                                    >
-                                        Cálculo de peajes
-                                    </label>
-
-                                    <select
-                                        id="modo-peajes"
-                                        class="form-select"
-                                        required
-                                    >
-                                        <option value="automatico">
-                                            Automático
-                                        </option>
-
-                                        <option value="manual">
-                                            Manual
-                                        </option>
-                                    </select>
-
-                                    <div class="form-text">
-                                        Automático utiliza los peajes
-                                        detectados sobre la ruta.
-                                    </div>
-                                </div>
-
-                                <!-- Peajes manuales -->
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="valor-peajes"
-                                        class="form-label"
-                                    >
-                                        Peajes por trayecto
-                                    </label>
-
-                                    <input
-                                        id="valor-peajes"
-                                        class="form-control"
-                                        type="number"
-                                        min="0"
-                                        step="1"
-                                        value="0"
-                                    >
-
-                                    <div class="form-text">
-                                        Solo se utiliza cuando el cálculo
-                                        de peajes está en modo manual.
-                                    </div>
-                                </div>
-
-                                <!-- Gastos adicionales -->
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="gastos-adicionales"
-                                        class="form-label"
-                                    >
-                                        Otros gastos
-                                    </label>
-
-                                    <input
-                                        id="gastos-adicionales"
-                                        class="form-control"
-                                        type="number"
-                                        min="0"
-                                        step="1"
-                                        value="0"
-                                    >
-
-                                    <div class="form-text">
-                                        Viáticos, parqueaderos,
-                                        alimentación u otros.
-                                    </div>
-                                </div>
-
-                                <!-- Utilidad -->
-                                <div class="col-12 col-md-6">
-                                    <label
-                                        for="porcentaje-utilidad"
-                                        class="form-label"
-                                    >
-                                        Utilidad %
-                                    </label>
-
-                                    <input
-                                        id="porcentaje-utilidad"
-                                        class="form-control"
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        step="0.1"
-                                        value="20"
-                                    >
-
-                                    <div class="form-text">
-                                        Porcentaje aplicado al costo operativo.
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <button
-                                id="boton-calcular"
-                                class="btn btn-success w-100 mt-4"
-                                type="submit"
-                            >
-                                Calcular cotización
-                            </button>
-
-                        </form>
-
-                        <div
-                            id="mensaje-error"
-                            class="alert alert-danger mt-3 d-none"
-                            role="alert"
-                        ></div>
-
+    <main class="container-fluid px-lg-4 py-4 py-lg-5">
+        <div class="workspace-grid">
+            <section class="panel panel-form">
+                <div class="panel-heading">
+                    <span class="step-number">01</span>
+                    <div>
+                        <p class="section-kicker">Datos del viaje</p>
+                        <h2>Configura la cotización</h2>
                     </div>
                 </div>
+
+                <form id="form-cotizacion">
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <span>Ruta</span>
+                            <small>Selecciona municipios o ajusta los puntos en el mapa.</small>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label for="origen-longitud" class="form-label">Longitud de origen</label>
+                                <input id="origen-longitud" class="form-control" type="number" step="any" min="-180" max="180" value="-74.0721" required>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="origen-latitud" class="form-label">Latitud de origen</label>
+                                <input id="origen-latitud" class="form-control" type="number" step="any" min="-90" max="90" value="4.711" required>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="destino-longitud" class="form-label">Longitud de destino</label>
+                                <input id="destino-longitud" class="form-control" type="number" step="any" min="-180" max="180" value="-74.3638" required>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="destino-latitud" class="form-label">Latitud de destino</label>
+                                <input id="destino-latitud" class="form-control" type="number" step="any" min="-90" max="90" value="4.3365" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <span>Vehículo y combustible</span>
+                            <small>Define el consumo utilizado en el cálculo.</small>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label for="tipo-vehiculo" class="form-label">Tipo de vehículo</label>
+                                <select id="tipo-vehiculo" class="form-select" required>
+                                    <option value="camion">Camión</option>
+                                    <option value="carro">Carro</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="tipo-combustible" class="form-label">Tipo de combustible</label>
+                                <select id="tipo-combustible" class="form-select" required>
+                                    <option value="acpm">ACPM</option>
+                                    <option value="gasolina">Gasolina</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="rendimiento" class="form-label">Rendimiento km/galón</label>
+                                <input id="rendimiento" class="form-control" type="number" min="0.1" max="100" step="0.1" value="10" required>
+                                <div class="form-text">Kilómetros recorridos por cada galón.</div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="precio-combustible" class="form-label">Precio por galón</label>
+                                <input id="precio-combustible" class="form-control" type="number" min="1" step="1" value="11616" required>
+                                <div class="form-text">Valor de referencia en pesos colombianos.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <span>Costos del viaje</span>
+                            <small>Configura peajes, gastos y utilidad.</small>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label for="numero-trayectos" class="form-label">Tipo de trayecto</label>
+                                <select id="numero-trayectos" class="form-select" required>
+                                    <option value="1">Solo ida</option>
+                                    <option value="2">Ida y regreso</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="categoria-peaje" class="form-label">Categoría de peaje</label>
+                                <select id="categoria-peaje" class="form-select" required>
+                                    <option value="I">Categoría I</option>
+                                    <option value="II">Categoría II</option>
+                                    <option value="III">Categoría III</option>
+                                    <option value="IV">Categoría IV</option>
+                                    <option value="V">Categoría V</option>
+                                    <option value="VI">Categoría VI</option>
+                                    <option value="VII">Categoría VII</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="modo-peajes" class="form-label">Cálculo de peajes</label>
+                                <select id="modo-peajes" class="form-select" required>
+                                    <option value="automatico">Automático</option>
+                                    <option value="manual">Manual</option>
+                                </select>
+                                <div class="form-text">El modo automático detecta peajes próximos a la ruta.</div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="valor-peajes" class="form-label">Peajes por trayecto</label>
+                                <input id="valor-peajes" class="form-control" type="number" min="0" step="1" value="0">
+                                <div class="form-text">Disponible cuando el cálculo está en modo manual.</div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="gastos-adicionales" class="form-label">Otros gastos</label>
+                                <input id="gastos-adicionales" class="form-control" type="number" min="0" step="1" value="0">
+                                <div class="form-text">Viáticos, parqueaderos, alimentación u otros.</div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="porcentaje-utilidad" class="form-label">Utilidad %</label>
+                                <input id="porcentaje-utilidad" class="form-control" type="number" min="0" max="100" step="0.1" value="20">
+                                <div class="form-text">Porcentaje aplicado al costo operativo.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="boton-calcular" class="calculate-button" type="submit">
+                        <span>Calcular cotización</span>
+                        <span aria-hidden="true">→</span>
+                    </button>
+                </form>
+
+                <div id="mensaje-error" class="alert alert-danger mt-3 d-none" role="alert"></div>
             </section>
 
-            <!-- Mapa y resultados -->
-            <section class="col-xl-8">
+            <section class="map-column">
+                <article class="panel map-panel">
+                    <div class="panel-heading panel-heading-map">
+                        <span class="step-number">02</span>
+                        <div>
+                            <p class="section-kicker">Visualización</p>
+                            <h2>Mapa del recorrido</h2>
+                        </div>
+                    </div>
 
-                <div class="card shadow-sm">
-                    <div class="card-body">
-
-                        <h2 class="h5 mb-3">
-                            Mapa del recorrido
-                        </h2>
-
+                    <div class="map-frame">
                         <div id="mapa"></div>
-
-                        <p class="text-muted small mt-3 mb-0">
-                            Haz clic sobre el mapa para seleccionar primero
-                            el origen y después el destino. Los peajes
-                            detectados se mostrarán sobre el recorrido.
-                        </p>
-
                     </div>
-                </div>
 
-                <div
-                    id="resultado"
-                    class="card shadow-sm mt-4 d-none"
-                >
-                    <div class="card-body">
+                    <p class="map-help">
+                        Haz clic sobre el mapa para elegir primero el origen y después el destino.
+                        También puedes arrastrar los marcadores para precisar cada punto.
+                    </p>
+                </article>
 
-                        <h2 class="h5 mb-3">
-                            Resumen de cotización
-                        </h2>
-
-                        <div
-                            id="resumen"
-                            class="row g-3"
-                        ></div>
-
+                <article id="resultado" class="panel result-panel d-none">
+                    <div class="panel-heading">
+                        <span class="step-number">03</span>
+                        <div>
+                            <p class="section-kicker">Resultado</p>
+                            <h2>Resumen de cotización</h2>
+                        </div>
                     </div>
-                </div>
-
+                    <div id="resumen" class="row g-3"></div>
+                </article>
             </section>
-
         </div>
     </main>
 
-    <!-- Leaflet JavaScript -->
-    <script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    ></script>
+    <footer class="site-footer">
+        <div class="container-fluid px-lg-4">
+            <span>Cotizador Logístico G&amp;A</span>
+            <span>Valores estimados sujetos a validación operativa.</span>
+        </div>
+    </footer>
 
-    <!-- JavaScript del cotizador -->
-
-<script src="/js/cotizacion.js?v=13"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/js/firebase-config.js?v=2"></script>
+    <script type="module" src="/js/auth-bootstrap.js?v=1"></script>
+    <script src="/js/auth-fetch.js?v=1"></script>
+    <script src="/js/cotizacion.js?v=18"></script>
+    <script src="/js/municipios-ui.js?v=4"></script>
+    <script src="/js/combustible-ui.js?v=4"></script>
 </body>
 </html>

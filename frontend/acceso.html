@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso | Cotizador Logístico G&amp;A</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/auth.css?v=1">
+</head>
+<body>
+    <main class="auth-page">
+        <section class="auth-shell" aria-label="Acceso de usuarios">
+            <aside class="auth-brand-panel">
+                <div class="brand-content">
+                    <div class="brand-mark">G&amp;A</div>
+                    <p class="brand-kicker">Cotizador logístico</p>
+                    <h1>Gestiona tus viajes con mayor precisión</h1>
+                    <p class="brand-copy">
+                        Consulta rutas, combustible, peajes y costos desde una sola plataforma.
+                    </p>
+                </div>
+            </aside>
+
+            <section class="auth-form-panel">
+                <div id="contenido-acceso">
+                    <div class="auth-heading">
+                        <div class="user-icon" aria-hidden="true">
+                            <span class="user-head"></span>
+                            <span class="user-body"></span>
+                        </div>
+                        <p class="eyebrow">Bienvenido</p>
+                        <h2>Inicia sesión</h2>
+                        <p>Accede a tu cuenta para continuar.</p>
+                    </div>
+
+                    <div id="mensaje-auth" class="alert d-none" role="alert"></div>
+
+                    <div class="auth-tabs" role="tablist" aria-label="Opciones de acceso">
+                        <button type="button" class="auth-tab active" data-panel="panel-login">Ingresar</button>
+                        <button type="button" class="auth-tab" data-panel="panel-registro">Registrarse</button>
+                        <button type="button" class="auth-tab" data-panel="panel-recuperar">Recuperar</button>
+                    </div>
+
+                    <div id="panel-login" class="panel-auth">
+                        <form id="form-login">
+                            <div class="field-group">
+                                <label for="login-email">Correo electrónico</label>
+                                <input id="login-email" type="email" autocomplete="email" placeholder="correo@ejemplo.com" required>
+                            </div>
+                            <div class="field-group">
+                                <label for="login-password">Contraseña</label>
+                                <input id="login-password" type="password" autocomplete="current-password" placeholder="Tu contraseña" required>
+                            </div>
+                            <button class="primary-button" type="submit">Iniciar sesión</button>
+                        </form>
+                    </div>
+
+                    <div id="panel-registro" class="panel-auth d-none">
+                        <form id="form-registro">
+                            <div class="field-group">
+                                <label for="registro-nombre">Nombre completo</label>
+                                <input id="registro-nombre" type="text" minlength="2" maxlength="100" autocomplete="name" required>
+                            </div>
+                            <div class="field-group">
+                                <label for="registro-telefono">Teléfono opcional</label>
+                                <input id="registro-telefono" type="tel" maxlength="30" autocomplete="tel">
+                            </div>
+                            <div class="field-group">
+                                <label for="registro-email">Correo electrónico</label>
+                                <input id="registro-email" type="email" autocomplete="email" required>
+                            </div>
+                            <div class="form-grid">
+                                <div class="field-group">
+                                    <label for="registro-password">Contraseña</label>
+                                    <input id="registro-password" type="password" minlength="6" autocomplete="new-password" required>
+                                </div>
+                                <div class="field-group">
+                                    <label for="registro-confirmar">Confirmar contraseña</label>
+                                    <input id="registro-confirmar" type="password" minlength="6" autocomplete="new-password" required>
+                                </div>
+                            </div>
+                            <button class="primary-button" type="submit">Crear cuenta</button>
+                        </form>
+                    </div>
+
+                    <div id="panel-recuperar" class="panel-auth d-none">
+                        <form id="form-recuperar">
+                            <div class="field-group">
+                                <label for="recuperar-email">Correo electrónico</label>
+                                <input id="recuperar-email" type="email" autocomplete="email" required>
+                                <small>Recibirás instrucciones para restablecer tu contraseña.</small>
+                            </div>
+                            <button class="primary-button" type="submit">Enviar recuperación</button>
+                        </form>
+                    </div>
+                </div>
+
+                <section id="contenido-sesion" class="d-none session-panel">
+                    <div class="user-icon" aria-hidden="true">
+                        <span class="user-head"></span>
+                        <span class="user-body"></span>
+                    </div>
+                    <p class="eyebrow">Sesión activa</p>
+                    <h2 id="perfil-nombre">Cargando...</h2>
+                    <p id="usuario-sesion"></p>
+                    <div class="session-data">
+                        <span>Rol</span>
+                        <strong id="perfil-rol">Cargando...</strong>
+                    </div>
+                    <a class="primary-button text-center text-decoration-none" href="/mapa">Ir al cotizador</a>
+                    <button id="boton-cerrar-sesion" class="secondary-button" type="button">Cerrar sesión</button>
+                </section>
+            </section>
+        </section>
+    </main>
+
+    <script src="/js/firebase-config.js?v=2"></script>
+    <script type="module" src="/js/auth-ui.js?v=2"></script>
+</body>
+</html>

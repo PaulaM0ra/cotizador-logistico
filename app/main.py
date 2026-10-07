@@ -3,6 +3,9 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from app.database.firebase import db
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 
 from app.routes.cotizaciones import (
     router as cotizaciones_router
@@ -12,6 +15,15 @@ from app.routes.rutas import (
 )
 from app.routes.vehiculos import (
     router as vehiculos_router
+)
+from app.routes.municipios import (
+    router as municipios_router
+)
+from app.routes.combustibles import (
+    router as combustibles_router
+)
+from app.routes.usuarios import (
+    router as usuarios_router
 )
 
 
@@ -34,7 +46,9 @@ app = FastAPI(
 app.include_router(vehiculos_router)
 app.include_router(rutas_router)
 app.include_router(cotizaciones_router)
-
+app.include_router(municipios_router)
+app.include_router(combustibles_router)
+app.include_router(usuarios_router)
 
 app.mount(
     "/frontend",
@@ -75,6 +89,20 @@ async def mostrar_mapa():
     return FileResponse(
         str(FRONTEND_DIR / "index.html")
     )
+@app.get("/acceso", include_in_schema=False)
+async def mostrar_acceso():
+    archivo_acceso = FRONTEND_DIR / "acceso.html"
+
+    if not archivo_acceso.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="No se encontró frontend/acceso.html"
+        )
+
+    return FileResponse(
+        str(archivo_acceso)
+    )
+
 
 
 @app.get("/salud", tags=["Inicio"])
