@@ -13,7 +13,29 @@ const app = getApps().length
     : initializeApp(window.FIREBASE_CONFIG);
 
 const auth = getAuth(app);
+
+/*
+ * Permite que cotizacion.js y auth-fetch.js
+ * utilicen la misma instancia de Firebase Auth.
+ */
+window.firebaseAuth = auth;
+
 let vehiculos = [];
+window.firebaseAuthReady = new Promise(
+    (resolve) => {
+        const cancelarObservador = onAuthStateChanged(
+            auth,
+            (usuario) => {
+                resolve({
+                    auth,
+                    usuario
+                });
+
+                cancelarObservador();
+            }
+        );
+    }
+);
 
 function escapar(valor) {
     const elemento = document.createElement("div");

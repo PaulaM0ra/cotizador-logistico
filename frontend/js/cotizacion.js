@@ -1,13 +1,10 @@
 console.log("cotizacion.js cargado correctamente");
 
-const mapa = L.map(
-    "mapa",
-    {
-        center: [4.5709, -74.2973],
-        zoom: 9,
-        zoomControl: true
-    }
-);
+const mapa = L.map("mapa", {
+    center: [4.5709, -74.2973],
+    zoom: 9,
+    zoomControl: true
+});
 
 const capaBase = L.tileLayer(
     "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -16,25 +13,17 @@ const capaBase = L.tileLayer(
         maxZoom: 19,
         tileSize: 256,
         detectRetina: false,
-        attribution:
-            "&copy; colaboradores de OpenStreetMap"
+        attribution: "&copy; colaboradores de OpenStreetMap"
     }
 );
 
 capaBase.addTo(mapa);
 
-mapa.whenReady(
-    function () {
-        console.log("Mapa Leaflet listo");
+mapa.whenReady(() => {
+    console.log("Mapa Leaflet listo");
+    setTimeout(() => mapa.invalidateSize(true), 500);
+});
 
-        setTimeout(
-            function () {
-                mapa.invalidateSize(true);
-            },
-            500
-        );
-    }
-);
 let capaRuta = null;
 let marcadorOrigen = null;
 let marcadorDestino = null;
@@ -65,39 +54,55 @@ function formatearDinero(valor) {
     }).format(valor ?? 0);
 }
 
-function colocarMarcadorOrigen(latitud, longitud) {
-    if (marcadorOrigen) {
-        mapa.removeLayer(marcadorOrigen);
+function obtenerVehiculoSeleccionado() {
+    const selector = document.getElementById("vehiculo-registrado");
+    const tipoVehiculo = document.getElementById("tipo-vehiculo");
+
+    if (!selector || !selector.value) {
+        return null;
     }
 
-    marcadorOrigen = L.marker([latitud, longitud], {
-        draggable: true
-    })
+    return {
+        placa_vehiculo: selector.value,
+        tipo_vehiculo_registrado:
+            tipoVehiculo.dataset.tipoRegistrado || null,
+        tipo_carroceria:
+            tipoVehiculo.dataset.tipoCarroceria || "sin_furgon",
+        numero_ejes: tipoVehiculo.dataset.numeroEjes
+            ? Number(tipoVehiculo.dataset.numeroEjes)
+            : null
+    };
+}
+
+function colocarMarcadorOrigen(latitud, longitud) {
+    if (marcadorOrigen) mapa.removeLayer(marcadorOrigen);
+
+    marcadorOrigen = L.marker([latitud, longitud], { draggable: true })
         .addTo(mapa)
         .bindPopup("<strong>Origen del viaje</strong>");
 
-    marcadorOrigen.on("dragend", function (evento) {
+    marcadorOrigen.on("dragend", (evento) => {
         const posicion = evento.target.getLatLng();
-        document.getElementById("origen-latitud").value = posicion.lat.toFixed(6);
-        document.getElementById("origen-longitud").value = posicion.lng.toFixed(6);
+        document.getElementById("origen-latitud").value =
+            posicion.lat.toFixed(6);
+        document.getElementById("origen-longitud").value =
+            posicion.lng.toFixed(6);
     });
 }
 
 function colocarMarcadorDestino(latitud, longitud) {
-    if (marcadorDestino) {
-        mapa.removeLayer(marcadorDestino);
-    }
+    if (marcadorDestino) mapa.removeLayer(marcadorDestino);
 
-    marcadorDestino = L.marker([latitud, longitud], {
-        draggable: true
-    })
+    marcadorDestino = L.marker([latitud, longitud], { draggable: true })
         .addTo(mapa)
         .bindPopup("<strong>Destino del viaje</strong>");
 
-    marcadorDestino.on("dragend", function (evento) {
+    marcadorDestino.on("dragend", (evento) => {
         const posicion = evento.target.getLatLng();
-        document.getElementById("destino-latitud").value = posicion.lat.toFixed(6);
-        document.getElementById("destino-longitud").value = posicion.lng.toFixed(6);
+        document.getElementById("destino-latitud").value =
+            posicion.lat.toFixed(6);
+        document.getElementById("destino-longitud").value =
+            posicion.lng.toFixed(6);
     });
 }
 
@@ -106,7 +111,6 @@ function actualizarMarcadoresDesdeFormulario() {
         obtenerNumero("origen-latitud"),
         obtenerNumero("origen-longitud")
     );
-
     colocarMarcadorDestino(
         obtenerNumero("destino-latitud"),
         obtenerNumero("destino-longitud")
@@ -132,6 +136,7 @@ function obtenerNombreCampo(ubicacion) {
     if (partes.includes("destino")) complemento = " de destino";
 
     const nombres = {
+        placa_vehiculo: "La placa del vehículo",
         latitud: `La latitud${complemento}`,
         longitud: `La longitud${complemento}`,
         tipo_vehiculo: "El tipo de vehículo",
@@ -162,9 +167,7 @@ function traducirErrorValidacion(error) {
     if (tipo === "greater_than") {
         return `${campo} debe ser mayor que ${error.ctx?.gt}.`;
     }
-    if (tipo === "missing") {
-        return `${campo} es obligatorio.`;
-    }
+    if (tipo === "missing") return `${campo} es obligatorio.`;
     if (tipo.includes("float") || tipo.includes("number") || tipo.includes("int")) {
         return `${campo} debe contener un número válido.`;
     }
@@ -179,39 +182,33 @@ function obtenerMensajeError(contenido, estado) {
     if (Array.isArray(contenido?.detail)) {
         return contenido.detail.map(traducirErrorValidacion).join(" ");
     }
-    if (typeof contenido?.detail === "string") {
-        return contenido.detail;
-    }
-    if (contenido?.detail?.mensaje) {
-        return contenido.detail.mensaje;
-    }
+    if (typeof contenido?.detail === "string") return contenido.detail;
+    if (contenido?.detail?.mensaje) return contenido.detail.mensaje;
+    if (estado === 401) return "Debes iniciar sesión nuevamente.";
+    if (estado === 403) return "No tienes permiso para usar este vehículo.";
     if (estado === 503) {
         return "No fue posible conectarse con el servicio externo requerido.";
     }
     if (estado === 504) {
         return "El servicio externo tardó demasiado en responder.";
     }
-
     return "No fue posible calcular la cotización.";
 }
 
 function dibujarRuta(geometria) {
-    if (capaRuta) {
-        mapa.removeLayer(capaRuta);
-    }
+    if (capaRuta) mapa.removeLayer(capaRuta);
 
     capaRuta = L.geoJSON(geometria, {
         style: {
-            color: "#198754",
+            color: "#1976d2",
             weight: 6,
             opacity: 0.85
         }
     }).addTo(mapa);
 
-    setTimeout(function () {
+    setTimeout(() => {
         mapa.invalidateSize();
         const limites = capaRuta.getBounds();
-
         if (limites.isValid()) {
             mapa.fitBounds(limites, { padding: [30, 30] });
         }
@@ -219,22 +216,19 @@ function dibujarRuta(geometria) {
 }
 
 function limpiarMarcadoresPeajes() {
-    marcadoresPeajes.forEach(function (marcador) {
-        mapa.removeLayer(marcador);
-    });
+    marcadoresPeajes.forEach((marcador) => mapa.removeLayer(marcador));
     marcadoresPeajes = [];
 }
 
 function mostrarPeajesEnMapa(peajes) {
     limpiarMarcadoresPeajes();
-
     if (!Array.isArray(peajes)) return;
 
-    peajes.forEach(function (peaje) {
-        if (!Number.isFinite(Number(peaje.latitud)) ||
-            !Number.isFinite(Number(peaje.longitud))) {
-            return;
-        }
+    peajes.forEach((peaje) => {
+        if (
+            !Number.isFinite(Number(peaje.latitud)) ||
+            !Number.isFinite(Number(peaje.longitud))
+        ) return;
 
         const tarifa = peaje.tarifa == null
             ? "Tarifa no disponible"
@@ -285,11 +279,10 @@ function crearDetallePeajes(peajes) {
         `;
     }
 
-    return peajes.detalle.map(function (peaje) {
+    return peajes.detalle.map((peaje) => {
         const tarifa = peaje.tarifa == null
             ? "Tarifa no disponible"
             : formatearDinero(peaje.tarifa);
-
         const ubicacion = peaje.ubicacion || "Ubicación no informada";
         const sentido = peaje.sentido ? ` · ${peaje.sentido}` : "";
 
@@ -310,71 +303,128 @@ function mostrarResumen(datos) {
     const combustible = datos.combustible;
     const peajes = datos.peajes;
     const costos = datos.costos;
+    const vehiculoSeleccionado = obtenerVehiculoSeleccionado();
 
     const tipoCombustible = combustible.tipo === "acpm" ? "ACPM" : "Gasolina";
     const modoPeajes = peajes.modo_calculo === "automatico" ? "Automático" : "Manual";
 
     contenedorResumen.innerHTML =
-        crearDato("Perfil de ruta", ruta.perfil) +
-        crearDato("Distancia de un trayecto", `${ruta.distancia_un_trayecto_km} km`) +
-        crearDato("Distancia total", `${ruta.distancia_total_km} km`) +
-        crearDato("Tipo de combustible", tipoCombustible) +
-        crearDato("Rendimiento", `${combustible.rendimiento_km_galon} km/galón`) +
-        crearDato("Galones estimados", combustible.galones_estimados) +
-        crearDato("Precio por galón", formatearDinero(combustible.precio_por_galon)) +
-        crearDato("Costo de combustible", formatearDinero(combustible.costo_estimado)) +
-        crearDato("Modo de peajes", modoPeajes) +
-        crearDato("Categoría de peaje", peajes.categoria) +
-        crearDato("Peajes detectados", peajes.cantidad_peajes) +
-        crearDato("Peajes por trayecto", formatearDinero(peajes.valor_un_trayecto)) +
-        crearDato("Costo total de peajes", formatearDinero(peajes.costo_total)) +
-        crearDato("Otros gastos", formatearDinero(costos.gastos_adicionales)) +
-        crearDato("Subtotal operativo", formatearDinero(costos.subtotal_operativo)) +
-        crearDato(
+        (vehiculoSeleccionado
+            ? crearDato("Placa", vehiculoSeleccionado.placa_vehiculo)
+                + crearDato(
+                    "Tipo registrado",
+                    vehiculoSeleccionado.tipo_vehiculo_registrado || "No informado"
+                )
+                + crearDato(
+                    "Carrocería",
+                    vehiculoSeleccionado.tipo_carroceria || "Sin furgón"
+                )
+            : "")
+        + crearDato("Perfil de ruta", ruta.perfil)
+        + crearDato("Distancia de un trayecto", `${ruta.distancia_un_trayecto_km} km`)
+        + crearDato("Distancia total", `${ruta.distancia_total_km} km`)
+        + crearDato("Tipo de combustible", tipoCombustible)
+        + crearDato("Rendimiento", `${combustible.rendimiento_km_galon} km/galón`)
+        + crearDato("Galones estimados", combustible.galones_estimados)
+        + crearDato("Precio por galón", formatearDinero(combustible.precio_por_galon))
+        + crearDato("Costo de combustible", formatearDinero(combustible.costo_estimado))
+        + crearDato("Modo de peajes", modoPeajes)
+        + crearDato("Categoría de peaje", peajes.categoria)
+        + crearDato("Peajes detectados", peajes.cantidad_peajes)
+        + crearDato("Peajes por trayecto", formatearDinero(peajes.valor_un_trayecto))
+        + crearDato("Costo total de peajes", formatearDinero(peajes.costo_total))
+        + crearDato("Otros gastos", formatearDinero(costos.gastos_adicionales))
+        + crearDato("Subtotal operativo", formatearDinero(costos.subtotal_operativo))
+        + crearDato(
             `Utilidad ${costos.porcentaje_utilidad}%`,
             formatearDinero(costos.valor_utilidad)
-        ) +
-        crearDato(
+        )
+        + crearDato(
             "Valor final del viaje",
             formatearDinero(costos.valor_cotizado),
             "col-md-8",
             "total"
-        ) +
-        `
+        )
+        + `
             <div class="col-12 mt-4">
-                <h3 class="h6 text-success">Peajes detectados</h3>
+                <h3 class="h6 text-primary">Peajes detectados</h3>
             </div>
-        ` +
-        crearDetallePeajes(peajes);
+        `
+        + crearDetallePeajes(peajes);
 
     tarjetaResultado.classList.remove("d-none");
 }
 
+async function obtenerUsuarioAutenticado() {
+    const auth = window.firebaseAuth;
+
+    if (!auth) {
+        throw new Error(
+            "Firebase Authentication todavía no se ha inicializado. "
+            + "Recarga la página e intenta nuevamente."
+        );
+    }
+
+    if (typeof auth.authStateReady === "function") {
+        await auth.authStateReady();
+    }
+
+    const usuario = auth.currentUser;
+
+    if (!usuario) {
+        throw new Error(
+            "Debes iniciar sesión para calcular una cotización."
+        );
+    }
+
+    return usuario;
+}
+
+
 async function consultarCotizacion(datos) {
-    const respuesta = await fetch("/cotizaciones/calcular", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(datos)
-    });
+    const usuario = await obtenerUsuarioAutenticado();
+
+    const token = await usuario.getIdToken(
+        true
+    );
+
+    const respuesta = await fetch(
+        "/cotizaciones/calcular",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+
+            body: JSON.stringify(datos)
+        }
+    );
 
     let contenido;
 
     try {
         contenido = await respuesta.json();
     } catch {
-        throw new Error("El servidor devolvió una respuesta no válida.");
+        throw new Error(
+            "El servidor devolvió una respuesta no válida."
+        );
     }
 
     if (!respuesta.ok) {
-        throw new Error(obtenerMensajeError(contenido, respuesta.status));
+        throw new Error(
+            obtenerMensajeError(
+                contenido,
+                respuesta.status
+            )
+        );
     }
 
     return contenido;
 }
 
-formulario.addEventListener("submit", async function (evento) {
+formulario.addEventListener("submit", async (evento) => {
     evento.preventDefault();
     ocultarError();
 
@@ -383,7 +433,17 @@ formulario.addEventListener("submit", async function (evento) {
         return;
     }
 
+    const vehiculoSeleccionado = obtenerVehiculoSeleccionado();
+
+    if (!vehiculoSeleccionado) {
+        mostrarError(
+            "Selecciona un vehículo registrado antes de calcular la cotización."
+        );
+        return;
+    }
+
     const datos = {
+        ...vehiculoSeleccionado,
         origen: {
             longitud: obtenerNumero("origen-longitud"),
             latitud: obtenerNumero("origen-latitud")
@@ -398,7 +458,8 @@ formulario.addEventListener("submit", async function (evento) {
         precio_combustible_galon: obtenerNumero("precio-combustible"),
         numero_trayectos: obtenerNumero("numero-trayectos"),
         categoria_peaje: obtenerTexto("categoria-peaje"),
-        usar_peajes_automaticos: obtenerTexto("modo-peajes") === "automatico",
+        usar_peajes_automaticos:
+            obtenerTexto("modo-peajes") === "automatico",
         valor_peajes: obtenerNumero("valor-peajes"),
         gastos_adicionales: obtenerNumero("gastos-adicionales"),
         porcentaje_utilidad: obtenerNumero("porcentaje-utilidad")
@@ -424,7 +485,7 @@ formulario.addEventListener("submit", async function (evento) {
     }
 });
 
-mapa.on("click", function (evento) {
+mapa.on("click", (evento) => {
     const latitud = evento.latlng.lat;
     const longitud = evento.latlng.lng;
 
@@ -445,7 +506,7 @@ mapa.on("click", function (evento) {
 
 document.getElementById("tipo-combustible").addEventListener(
     "change",
-    function (evento) {
+    (evento) => {
         const precioCombustible = document.getElementById("precio-combustible");
 
         if (evento.target.value === "acpm") {
@@ -459,17 +520,11 @@ document.getElementById("tipo-combustible").addEventListener(
 function actualizarModoPeajes() {
     const automatico = selectorModoPeajes.value === "automatico";
     campoValorPeajes.disabled = automatico;
-
-    if (automatico) {
-        campoValorPeajes.value = 0;
-    }
+    if (automatico) campoValorPeajes.value = 0;
 }
 
 selectorModoPeajes.addEventListener("change", actualizarModoPeajes);
 
 actualizarMarcadoresDesdeFormulario();
 actualizarModoPeajes();
-
-setTimeout(function () {
-    mapa.invalidateSize();
-}, 200);
+setTimeout(() => mapa.invalidateSize(), 200);
